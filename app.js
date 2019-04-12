@@ -1,38 +1,61 @@
 
+const baseUrl = "http://jsonplaceholder.typicode.com";
 
-Vue.component('static-posts', {
-
-    template: '#static-posts-template',
-
+const List = {
+    template: '#list-template',
     data: () => ({
         posts: []
     }),
-
     mounted() {
         this.getPosts();
     },
-
     methods: {
-
         getPosts() {
-            this.posts = [
-                {
-                    "title": "Powehi: black hole gets a name meaning 'the adorned fathomless dark creation'"
-                },
-                {
-                    "title": "Black hole picture captured for first time in space breakthrough"
-                },
-                {
-                    "title": "Japanese spacecraft 'bombs' asteroid in scientific mission"
-                },
-                {
-                    "title": "'A terrible thing': India's destruction of satellite threatens ISS, says Nasa"
-                }
-            ];
+            axios.get(baseUrl + `/posts`).then(response => {
+                this.posts = response.data;
+                console.log(this.posts);
+            }).catch(error => {
+                console.log(error);
+            })
         }
     }
+};
+
+const Post = {
+    template: '#post-template',
+    data: () => ({
+        post: null
+    }),
+    mounted() {
+        this.getPosts();
+    },
+    methods: {
+        getPosts() {
+            var id = this.$route.params.id;
+            axios.get(baseUrl + `/posts/` + id).then(response => {
+                this.post = response.data
+                console.log(this.post);
+            }).catch(error => {
+                console.log(error);
+            })
+        }
+    }
+};
+
+var router = new VueRouter({
+    mode: 'history',
+    routes: [
+        {
+            name: 'homepage',
+            path: '/',
+            component: List
+        }, {
+            name: 'post',
+            path: '/:id',
+            component: Post
+        }
+    ]
 });
 
-new Vue({
-    el: '#app'
-});
+var vue = new Vue({router});
+var app = vue.$mount('#app');
